@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        button.active {
+            background-color: aqua;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div style="position: relative;margin-left: 100px;">
+        <div>
+            <canvas style="margin-left: 100px; border-style: solid; " id="c1" width="800" height="600"></canvas>
+        </div>
+        <button style="margin-left: 100px;" id="boildBtn" onclick="boild()">粗线条</button>
+        <button style="margin-left: 5px;" id="thinBtn" onclick="thin()">细线条</button>
+        <button style="margin-left: 5px;" id="saveBtn" onclick="save()">保存</button>
+        <input type="color" style="margin-left: 5px;" id="colorBtn" value=""></input>
+        <button style="margin-left: 5px;" id="removeBtn" onclick="remove()" >橡皮擦</button>
+        <button style="margin-left: 5px;" id="clearBtn" onclick="clears()">清空</button>
+    </div>
+    <script>
+        const boildBtn = document.getElementById('boildBtn')
+        const thinBtn = document.getElementById('thinBtn')
+        const colorBtn = document.getElementById('colorBtn')
+        const saveBtn = document.getElementById('saveBtn')
+        const removeBtn = document.getElementById('removeBtn')
+        const clearBtn = document.getElementById('clearBtn')
+
+        const canvas = document.getElementById('c1')
+        const ctx = canvas.getContext('2d')
+        
+        ctx.save()
+
+        colorBtn.onchange = function(){
+            ctx.strokeStyle = colorBtn.value
+        }
+        const save =()=>{
+            var urlData = canvas.toDataURL()
+            var downloadA = document.createElement('a')
+            downloadA.setAttribute('download', '默认名称')
+            downloadA.href = urlData
+            downloadA.click()
+        }
+        const remove = () =>{
+            removeBtn.classList.add('active')
+            boildBtn.classList.remove('active')
+            thinBtn.classList.remove('active')
+            ctx.globalCompositeOperation = "destination-out"
+            ctx.lineWidth = 10
+        }
+
+        const boild = () => {
+            ctx.globalCompositeOperation = "source-over"
+            boildBtn.classList.add('active')
+            thinBtn.classList.remove('active')
+            removeBtn.classList.remove('active')
+            ctx.restore()
+            ctx.lineWidth = 16
+
+            ctx.save()
+        }
+        const thin = () => {
+            ctx.globalCompositeOperation = "source-over"
+            removeBtn.classList.remove('active')
+            boildBtn.classList.remove('active')
+            thinBtn.classList.add('active')
+            ctx.restore()
+            ctx.lineWidth = 2
+            
+            ctx.save()
+
+        }
+
+        const clears = () =>{
+            ctx.clearRect(0, 0, 800, 600)
+        }
+
+        var isdraw = false
+        canvas.addEventListener("mousedown", e => {
+            isdraw = true
+            ctx.beginPath()
+            ctx.moveTo(e.offsetX, e.offsetY)
+        })
+
+        canvas.addEventListener("mousemove", e => {
+            if (isdraw) {
+                ctx.lineTo(e.offsetX, e.offsetY)
+                ctx.stroke()
+            }
+        })
+        canvas.addEventListener("mouseup", e => {
+
+            isdraw = false
+            ctx.closePath()
+        })
+    </script>
+
+</body>
+
+</html>
